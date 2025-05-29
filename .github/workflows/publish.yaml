@@ -1,0 +1,19 @@
+name: Publish Docker Image
+
+on:
+  schedule:
+    - cron: "15 1 * * *"
+
+jobs:
+  call-publish-docker-image:
+    uses: ./.github/workflows/docker-image.yaml
+    secrets:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+  call-publish-oxide-docker-image:
+    needs: call-publish-docker-image
+    uses: ./.github/workflows/oxide-docker-image.yaml
+    secrets:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
