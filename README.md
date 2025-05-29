@@ -4,10 +4,16 @@
 [![Code Quality](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/code-quality.yaml/badge.svg)](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/code-quality.yaml)
 [![Publish Docker Image](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/publish.yaml/badge.svg)](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/publish.yaml)
 [![Release Helm Charts](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/helm-release.yaml/badge.svg)](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/helm-release.yaml)
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/pfeiffermax/valheim-dedicated-server?sort=semver)
+![Docker Pulls](https://img.shields.io/docker/pulls/pfeiffermax/valheim-dedicated-server)
+
 # Valheim Dedicated Server - Docker Image and Helm Chart
 This Docker image provides a [Valheim](https://www.valheimgame.com/) dedicated game server.
+
+**Docker Hub:** https://hub.docker.com/r/pfeiffermax/valheim-dedicated-server
+**GitHub Repository:** https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm
 
 ## Information Sources
 * [SteamDB](https://steamdb.info/app/896660/info/)
 * [Official Valheim dedicated server guide](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/)
-* [Valheim dedictated Server Fadom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers) 
+* [Valheim dedictated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers) 
