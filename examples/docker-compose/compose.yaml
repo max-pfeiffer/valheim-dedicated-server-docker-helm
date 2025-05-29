@@ -1,0 +1,31 @@
+name: valheim
+
+services:
+  valheim-server:
+    image: "pfeiffermax/valheim-dedicated-server:latest"
+    pull_policy: always
+    container_name: "valheim-server"
+    command:
+      - "-name"
+      - "ValheimServer"
+      - "-world"
+      - "NewWorld"
+      - "-password"
+      - "supersecret"
+      - "-port"
+      - "2456"
+      - "-public"
+      - "0"
+      - "-savedir"
+      - "/srv/valheim/saves"
+    ports:
+      - "2456:2456/udp"
+      - "2457:2457/udp"
+    volumes:
+      - type: volume
+        source: save_dir
+        target: "/srv/valheim/saves"
+
+volumes:
+  save_dir:
+    name: "valheim-save-dir"
