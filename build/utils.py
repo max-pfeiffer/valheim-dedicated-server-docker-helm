@@ -37,7 +37,7 @@ def get_valheim_build_id() -> str:
     client.anonymous_login()
     client.verbose_debug = False
     info: dict = client.get_product_info(apps=[896660], timeout=1)
-    build_id: str = info["apps"][896660]["depots"]["branches"]["release"]["buildid"]
+    build_id: str = info["apps"][896660]["depots"]["branches"]["public"]["buildid"]
     return build_id
 
 
