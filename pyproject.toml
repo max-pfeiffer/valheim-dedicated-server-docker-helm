@@ -11,8 +11,7 @@ requires-python = ">=3.12,<4"
 dependencies = [
     "click (>=8.2.1,<9.0.0)",
     "python-on-whales (>=0.77.0,<0.78.0)",
-    "steam (>=1.4.4,<2.0.0)"
-
+    "steam[client] (>=1.4.4,<2.0.0)",
 ]
 
 [tool.poetry]
