@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff
+        entry: ruff check
+        language: python
+        types_or: [python, pyi]
+        args: ["--fix", "--config", "pyproject.toml", "build", "tests"]
+        require_serial: true
+      - id: ruff-format
+        name: ruff-format
+        entry: ruff format
+        language: python
+        types_or: [python, pyi]
+        args: ["--config", "pyproject.toml", "build", "tests"]
+        require_serial: true

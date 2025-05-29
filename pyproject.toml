@@ -1,0 +1,55 @@
+[project]
+name = "valheim-dedicated-server-docker-helm"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Max Pfeiffer",email = "max@maxpfeiffer.ch"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12,<4"
+dependencies = [
+    "click (>=8.2.1,<9.0.0)",
+    "python-on-whales (>=0.77.0,<0.78.0)",
+    "steam (>=1.4.4,<2.0.0)"
+
+]
+
+[tool.poetry]
+
+[tool.poetry.group.dev.dependencies]
+bcrypt = "4.3.0"
+furl = "2.1.4"
+pre-commit = "4.2.0"
+pytest = "8.3.5"
+pytest-cov = "6.1.1"
+ruff = "0.11.11"
+testcontainers = "4.10.0"
+
+[tool.ruff]
+exclude = [".venv"]
+
+[tool.ruff.lint]
+select = [
+    "F", # Pyflakes
+    "E", # pycodestyle
+    "W", # pycodestyle
+    "I", # isort
+    "D",   # pydocstyle
+    "UP",  # pyupgrade
+    "ASYNC", # flake8-async
+    "RUF",  # Ruff-specific rules
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+# https://docs.pytest.org/en/latest/reference/customize.html
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
