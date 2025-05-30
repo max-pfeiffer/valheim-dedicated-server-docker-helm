@@ -9,8 +9,8 @@ about that topic.
 ### Helm
 Currently, you can run a single server instance with each Helm installation. The installation is done as follows:
 ```shell
-$ helm repo add rust https://max-pfeiffer.github.io/rust-game-server-docker
-$ helm install rust rust/rust --values your_values.yaml --namespace yournamespace 
+$ helm repo add valheim https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm/actions
+$ helm install valheim valheim/valheim --values your_values.yaml --namespace yournamespace 
 ```
 
 ### Argo CD
