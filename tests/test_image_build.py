@@ -43,7 +43,8 @@ def test_image_build(
     furl_item: furl = furl(f"http://{registry_container.get_registry()}")
     furl_item.path /= "v2/_catalog"
 
-    response: Response = get(furl_item.url, auth=BASIC_AUTH)
+    # response: Response = get(furl_item.url, auth=BASIC_AUTH)
+    response: Response = get(furl_item.url)
 
     assert response.status_code == 200
     assert response.json() == {"repositories": ["pfeiffermax/valheim-dedicated-server"]}
@@ -51,7 +52,8 @@ def test_image_build(
     furl_item: furl = furl(f"http://{registry_container.get_registry()}")
     furl_item.path /= "v2/pfeiffermax/valheim-dedicated-server/tags/list"
 
-    response: Response = get(furl_item.url, auth=BASIC_AUTH)
+    # response: Response = get(furl_item.url, auth=BASIC_AUTH)
+    response: Response = get(furl_item.url)
 
     assert response.status_code == 200
 

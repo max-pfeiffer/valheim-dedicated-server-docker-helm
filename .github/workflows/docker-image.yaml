@@ -10,7 +10,7 @@ on:
     secrets:
       DOCKER_HUB_USERNAME:
         required: true
-      DOCKER_HUB_PASSWORD:
+      DOCKER_HUB_TOKEN:
         required: true
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - name: Build and publish Images to Docker Hub
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           PUBLISH_MANUALLY: ${{ inputs.PUBLISH_MANUALLY }}
         run: |          
           poetry run python -m build.publish

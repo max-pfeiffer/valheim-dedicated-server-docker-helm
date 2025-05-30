@@ -10,7 +10,11 @@
 # Valheim Dedicated Server - Docker Image and Helm Chart
 This Docker image provides a [Valheim](https://www.valheimgame.com/) dedicated game server.
 
+Kudus to:
+* [@jonakoudijs](https://github.com/jonakoudijs) for providing the [Steamcmd Docker image](https://github.com/steamcmd/docker) which is used here
+
 **Docker Hub:** https://hub.docker.com/r/pfeiffermax/valheim-dedicated-server
+
 **GitHub Repository:** https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm
 
 ## Information Sources
