@@ -9,7 +9,7 @@ about that topic.
 ### Helm
 Currently, you can run a single server instance with each Helm installation. The installation is done as follows:
 ```shell
-$ helm repo add valheim https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm/actions
+$ helm repo add valheim https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm
 $ helm install valheim valheim/valheim --values your_values.yaml --namespace yournamespace 
 ```
 
