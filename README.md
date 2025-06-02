@@ -11,6 +11,14 @@
 This Docker image provides a [Valheim](https://www.valheimgame.com/) dedicated game server.
 You will find here also a [Helm Chart](https://helm.sh/) for running a Valheim dedicated server on [Kubernetes container orchestration system](https://kubernetes.io/).
 
+My automation checks the [Valheim public branch](https://steamdb.info/app/896660/depots/?branch=public) every
+night. If a new release was published by [Iron Gate Studios](https://irongate.se/), a new Docker image will be built
+with this new version. Just use the `latest` tag and you will always have an up-to-date Docker image. No need to
+manually run any server updates and mess around with your Docker image. It's that simple. :smiley:
+
+Have a look at the [docker compose example](examples/docker-compose/compose.yaml) and its documentation.
+There you can see how a server update can be automated with a simple script.
+
 Kudus to:
 * [@jonakoudijs](https://github.com/jonakoudijs) for providing the [Steamcmd Docker image](https://github.com/steamcmd/docker) which is used here
 
@@ -38,7 +46,7 @@ If you want to run your Rust server on bare metal Kubernetes, check out
 [my blog article](https://max-pfeiffer.github.io/blog/hosting-game-servers-on-bare-metal-kubernetes-with-kube-vip.html)
 on how to do that using [kube-vip](https://kube-vip.io/).
 
-## Information Sources
+## Additional Information Sources
 * [SteamDB](https://steamdb.info/app/896660/info/)
 * [Official Valheim dedicated server guide](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/)
 * [Valheim dedictated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers) 
