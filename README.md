@@ -64,4 +64,7 @@ on how to do that using [kube-vip](https://kube-vip.io/).
 ## Additional Information Sources
 * [SteamDB](https://steamdb.info/app/896660/info/)
 * [Official Valheim dedicated server guide](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/)
-* [Valheim dedictated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers) 
+* [Valheim dedictated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers)
+
+## Other Game Server Projects
+* [Rust dedicated server](https://github.com/max-pfeiffer/rust-game-server-docker)
