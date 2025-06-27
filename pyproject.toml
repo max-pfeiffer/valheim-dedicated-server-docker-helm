@@ -9,7 +9,7 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.12,<4"
 dependencies = [
-    "click (>=8.2.1,<9.0.0)",
+    "click (==8.1.8)",
     "python-on-whales (>=0.77.0,<0.78.0)",
     "steam[client] (>=1.4.4,<2.0.0)",
 ]
@@ -20,9 +20,8 @@ dependencies = [
 bcrypt = "4.3.0"
 furl = "2.1.4"
 pre-commit = "4.2.0"
-pytest = "8.3.5"
-pytest-cov = "6.1.1"
-ruff = "0.11.12"
+pytest = "8.4.1"
+pytest-cov = "6.2.1"
 testcontainers = "4.10.0"
 
 [tool.ruff]
