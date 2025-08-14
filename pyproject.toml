@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12,<4"
 dependencies = [
     "click (==8.1.8)",
-    "python-on-whales (>=0.77.0,<0.78.0)",
+    "python-on-whales (>=0.77.0,<=0.78.0)",
     "steam[client] (>=1.4.4,<2.0.0)",
 ]
 
@@ -19,7 +19,7 @@ dependencies = [
 [tool.poetry.group.dev.dependencies]
 bcrypt = "4.3.0"
 furl = "2.1.4"
-pre-commit = "4.2.0"
+pre-commit = "4.3.0"
 pytest = "8.4.1"
 pytest-cov = "6.2.1"
 testcontainers = "4.12.0"
