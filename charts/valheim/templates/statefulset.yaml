@@ -63,7 +63,7 @@ spec:
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "valheim.fullname" . }}
+                  name: {{ ternary (include "valheim.fullname" .) .Values.valheimDedicatedServer.existingSecret (empty .Values.valheimDedicatedServer.existingSecret) }}
                   key: password
           ports:
             - name: server-port

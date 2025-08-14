@@ -119,3 +119,7 @@ valheimDedicatedServer:
   backupLong: "43200"
   # Size of the volume the server uses for its saves directory.
   volumeStorageSize: "1Gi"
+  # Name of the existing secret to use for the server password.
+  # If this is set valheimDedicatedServer.password will be ignored.
+  # The existing secret needs to have stored Valheim server password under the key password.
+  existingSecret: ""
