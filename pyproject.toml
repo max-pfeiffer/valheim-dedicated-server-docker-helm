@@ -19,7 +19,7 @@ dependencies = [
 [tool.poetry.group.dev.dependencies]
 bcrypt = "4.3.0"
 furl = "2.1.4"
-pre-commit = "4.3.0"
+pre-commit = "4.5.0"
 pytest = "8.4.1"
 pytest-cov = "6.2.1"
 testcontainers = "4.12.0"
