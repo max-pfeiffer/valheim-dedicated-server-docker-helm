@@ -1,5 +1,11 @@
 FROM steamcmd/steamcmd:debian-trixie AS install-stage
 
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    libatomic1 \
+    libpulse-dev \
+    libpulse0
+
 RUN steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit
 
 FROM debian:trixie-slim AS production-image
