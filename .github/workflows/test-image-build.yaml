@@ -1,17 +1,19 @@
 name: Test Image Build
 
 on:
-  push:
+  pull_request:
     paths:
+      - .github/**
       - build/**
       - tests/**
+      - poetry.lock
 
 jobs:
   test-image-build:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python environment
         uses: ./.github/actions/setup-environment
       - name: Install dependencies

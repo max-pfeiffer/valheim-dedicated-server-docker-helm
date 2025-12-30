@@ -1,4 +1,8 @@
-FROM steamcmd/steamcmd:debian-bookworm
+FROM steamcmd/steamcmd:debian-trixie AS install-stage
+
+RUN steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit
+
+FROM debian:trixie-slim AS production-image
 
 # Install dependencies
 RUN apt-get update \
@@ -6,15 +10,16 @@ RUN apt-get update \
     libatomic1 \
     libpulse-dev \
     libpulse0 \
-    netcat-traditional
+    netcat-traditional \
+    gettext-base \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /srv/valheim
 
-RUN steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit
+COPY --from=install-stage /srv/valheim /srv/valheim
 
-COPY start.sh start.sh
-
-RUN chmod +x start.sh
+COPY start.sh /srv/valheim/start.sh
+RUN chmod +x /srv/valheim/start.sh
 
 EXPOSE 2456/udp 2457/udp
 
