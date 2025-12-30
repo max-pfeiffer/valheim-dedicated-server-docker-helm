@@ -87,6 +87,7 @@ def main(
 
         docker_client.buildx.build(
             context_path=context,
+            target="production-image",
             tags=[image_reference_version, image_reference_latest],
             platforms=["linux/amd64"],
             builder=builder,

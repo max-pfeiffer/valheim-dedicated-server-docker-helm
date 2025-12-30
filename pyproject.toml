@@ -1,6 +1,6 @@
 [project]
 name = "valheim-dedicated-server-docker-helm"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = [
     {name = "Max Pfeiffer",email = "max@maxpfeiffer.ch"}
@@ -9,23 +9,24 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.12,<4"
 dependencies = [
-    "click (==8.1.8)",
-    "python-on-whales (>=0.77.0,<=0.78.0)",
+    "click (==8.3.1)",
+    "python-on-whales (==0.79.0)",
     "steam[client] (>=1.4.4,<2.0.0)",
 ]
 
 [tool.poetry]
 
 [tool.poetry.group.dev.dependencies]
-bcrypt = "4.3.0"
+bcrypt = "5.0.0"
 furl = "2.1.4"
-pre-commit = "4.3.0"
-pytest = "8.4.1"
-pytest-cov = "6.2.1"
-testcontainers = "4.12.0"
+pre-commit = "4.5.1"
+pytest = "9.0.2"
+pytest-cov = "7.0.0"
+testcontainers = "4.13.3"
 
 [tool.ruff]
-exclude = [".venv"]
+src = ["build", "tests"]
+extend-exclude = ["charts", "examples"]
 
 [tool.ruff.lint]
 select = [
