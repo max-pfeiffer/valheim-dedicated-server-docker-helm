@@ -4,7 +4,8 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     libatomic1 \
     libpulse-dev \
-    libpulse0
+    libpulse0 \
+    ca-certificates
 
 RUN steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit
 
@@ -16,6 +17,7 @@ RUN apt-get update \
     libatomic1 \
     libpulse-dev \
     libpulse0 \
+    ca-certificates \
     netcat-traditional \
     gettext-base \
     && rm -rf /var/lib/apt/lists/*
