@@ -6,7 +6,7 @@ metadata:
     {{- include "valheim.labels" . | nindent 4 }}
 spec:
   serviceName: {{ include "valheim.fullname" . }}
-  replicas: 1
+  replicas: {{ len .Values.instances }}
   selector:
     matchLabels:
       {{- include "valheim.selectorLabels" . | nindent 6 }}
@@ -36,34 +36,37 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "-name"
-            - "{{ .Values.valheimDedicatedServer.name }}"
+            - "$name"
             - "-world"
-            - "{{ .Values.valheimDedicatedServer.world }}"
+            - "$world"
             - "-password"
-            - "$(PASSWORD)"
+            - "$password"
             - "-port"
             - "{{ .Values.valheimDedicatedServer.port }}"
             - "-public"
-            - "{{ .Values.valheimDedicatedServer.public }}"
-            {{- if .Values.valheimDedicatedServer.crossPlay }}
-            - "-crossplay"
-            {{- end }}
+            - "$public"
             - "-saveinterval"
-            - "{{ .Values.valheimDedicatedServer.saveInterval }}"
+            - "$saveInterval"
             - "-backups"
-            - "{{ .Values.valheimDedicatedServer.backups }}"
+            - "$backups"
             - "-backupshort"
-            - "{{ .Values.valheimDedicatedServer.backupShort }}"
+            - "$backupShort"
             - "-backuplong"
-            - "{{ .Values.valheimDedicatedServer.backupLong}}"
+            - "$backupLong"
             - "-savedir"
             - "/srv/valheim/saves"
+            - "instanceid"
+            - "$(POD_NAME)"
+            - "$crossPlay"
           env:
-            - name: PASSWORD
+            - name: POD_NAME
               valueFrom:
-                secretKeyRef:
-                  name: {{ ternary (include "valheim.fullname" .) .Values.valheimDedicatedServer.existingSecret (empty .Values.valheimDedicatedServer.existingSecret) }}
-                  key: password
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CONFIG_FILE_PATH
+              value: "/srv/valheim/config/$(POD_NAME)"
+            - name: SECRET_FILE_PATH
+              value: "/srv/valheim/secret/$(POD_NAME)"
           ports:
             - name: server-port
               containerPort: {{ .Values.valheimDedicatedServer.port }}
@@ -100,6 +103,10 @@ spec:
           volumeMounts:
             - name: saves-directory
               mountPath: "/srv/valheim/saves"
+            - name: config
+              mountPath: "/srv/valheim/config"
+            - name: secret
+              mountPath: "/srv/valheim/secret"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -112,6 +119,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "valheim.fullname" $ }}
+        - name: secret
+          secret:
+            secretName: {{ include "valheim.fullname" $ }}
   volumeClaimTemplates:
   - metadata:
       name: saves-directory
