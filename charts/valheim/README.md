@@ -1,5 +1,6 @@
 # Valheim Helm Chart
-A [Helm chart](https://helm.sh/) for running a Valheim dedicated server.
+A [Helm chart](https://helm.sh/) for running a Valheim dedicated server. Since v1.0.0 this Helm chart supports running multiple
+server instances using one StatefulSet. 
 
 ## Installation
 If you want to run Valheim on a bare metal Kubernetes cluster, I recommend reading
@@ -7,7 +8,12 @@ If you want to run Valheim on a bare metal Kubernetes cluster, I recommend readi
 about that topic.
 
 ### Helm
-Currently, you can run a single server instance with each Helm installation. The installation is done as follows:
+You can run multiple server instance with each Helm installation. Please be aware that with a StatefulSet Kubernetes
+starts additional instances only after the first instance is in ready state. And Valheim server startup is slow,
+so it might take a while until your Valheim server fleet is up and running completely.
+It might better suit your needs to install multiple StatefulSets with separate Helm releases.
+
+The installation is done as follows:
 ```shell
 $ helm repo add valheim https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm
 $ helm install valheim valheim/valheim --values your_values.yaml --namespace yournamespace 
@@ -48,39 +54,40 @@ startupProbe:
 ```
 
 ### Valheim server config
-Tweak the Valheim server config to your liking. 
+Tweak the Valheim server config to your liking. You can add a list of server to `instances`. Please be aware that the
+configuration of resources and ports are shared by these instances.
 ```yaml
-valheimDedicatedServer:
-  # Name of your server that will be visible in the Server list.
-  # You can use just one single string without any spaces as this is specified as command line option.
-  name: "ValheimServer"
-  # A World with the name entered will be created. You may also choose an already existing World by entering its name.
-  world: "NewWorld"
-  # Server password
-  password: "supersecret"
-  # Port which you want the server to communicate with. Valheim uses the specified Port AND specified Port+1.
-  # Default Ports are 2456-2457.
-  port: 2456
-  # Set the visibility of your server. 1 is default and will make the server visible in the browser.
-  # Set it to 0 to make the server invisible and only joinable via the ‘Join IP’-button.
-  public: "1"
-  # Runs the Server on the Crossplay backend (PlayFab), which lets users from any platform join.
-  # If you set it to false, the Steam backend is used, which means only Steam users can see and join the Server.
-  crossPlay: false
-  # How often the world will save in seconds.
-  saveInterval: "1800"
-  # Sets how many automatic backups will be kept. The first is the ‘short’ backup length,
-  # and the rest are the ‘long’ backup length.
-  # By default that means one backup that is 2 hours old, and 3 backups that are 12 hours apart.
-  backups: "4"
-  # Sets the interval between the first automatic backups.
-  backupShort: "7200"
-  # Sets the interval between the subsequent automatic backups.
-  backupLong: "43200"
-  # Size of the volume the server uses for its saves directory.
-  volumeStorageSize: "1Gi"
-  # Name of the existing secret to use for the server password.
-  # If this is set valheimDedicatedServer.password will be ignored.
-  # The existing secret needs to have stored Valheim server password under the key password.
-  existingSecret: ""
+# You can choose to run multiple instances of Rust dedicated servers here.
+# For a new instance add another entry to this list.
+instances:
+    # Name of your server that will be visible in the Server list.
+    # You can use just one single string without any spaces as this is specified as command line option.
+  - name: "ValheimServer"
+    # A World with the name entered will be created. You may also choose an already existing World by entering its name.
+    world: "NewWorld"
+    # Server password
+    # ATTENTION: needs to be at least 5 characters long, otherwise the server startup fails!
+    password: "supersecret"
+    # Set the visibility of your server. 1 is default and will make the server visible in the browser.
+    # Set it to 0 to make the server invisible and only joinable via the ‘Join IP’-button.
+    public: "1"
+    # Runs the Server on the Crossplay backend (PlayFab), which lets users from any platform join.
+    # If you set it to false, the Steam backend is used, which means only Steam users can see and join the Server.
+    crossPlay: false
+    # How often the world will save in seconds.
+    saveInterval: "1800"
+    # Sets how many automatic backups will be kept. The first is the ‘short’ backup length,
+    # and the rest are the ‘long’ backup length.
+    # By default, that means one backup that is 2 hours old, and 3 backups that are 12 hours apart.
+    backups: "4"
+    # Sets the interval between the first automatic backups.
+    backupShort: "7200"
+    # Sets the interval between the subsequent automatic backups.
+    backupLong: "43200"
+    # Pod specific service
+    service:
+      type: LoadBalancer
+      externalTrafficPolicy: Cluster
+      metadata:
+        annotations: {}
 ```
