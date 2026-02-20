@@ -27,6 +27,27 @@ monitor the [Valheim Docker Image](https://hub.docker.com/r/pfeiffermax/valheim-
 Valheim installation automatically when a new image is released.
 
 ## Configuration options
+### Security Context
+As the `pfeiffermax/valheim-dedicated-server` image runs the Rust server with an unprivileged user since V2.0.0,
+secure default values for `podSecurityContext` and `securityContext` were added.
+```yaml
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
+```
+If that doesn't suit your needs, just override these defaults.
+
 ### Resources
 Make sure to get the resource specs right. You will need at least two CPU cores and 2GB of RAM.
 [Using 4GB of RAM is recommended](https://valheim.fandom.com/wiki/Dedicated_servers#Requirements):
