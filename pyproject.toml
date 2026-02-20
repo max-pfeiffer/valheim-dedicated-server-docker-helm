@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12,<4"
 dependencies = [
     "click (==8.3.1)",
-    "python-on-whales (==0.79.0)",
+    "python-on-whales (==0.80.0)",
     "steam[client] (>=1.4.4,<2.0.0)",
 ]
 
@@ -22,7 +22,7 @@ furl = "2.1.4"
 pre-commit = "4.5.1"
 pytest = "9.0.2"
 pytest-cov = "7.0.0"
-testcontainers = "4.13.3"
+testcontainers = "4.14.1"
 
 [tool.ruff]
 src = ["build", "tests"]
