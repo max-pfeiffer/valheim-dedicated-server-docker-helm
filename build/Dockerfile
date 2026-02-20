@@ -1,4 +1,4 @@
-FROM steamcmd/steamcmd:debian-trixie AS install-stage
+FROM steamcmd/steamcmd:debian-bookworm AS install-stage
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
