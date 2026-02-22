@@ -28,10 +28,10 @@ RUN apt-get update \
 
 WORKDIR /srv/valheim
 
-COPY --from=install-stage --chown=valheim:valheim /srv/valheim /srv/valheim
+COPY --from=install-stage /srv/valheim /srv/valheim
 
 COPY start.sh /srv/valheim/start.sh
-RUN chmod +x /srv/valheim/start.sh
+RUN chmod +x /srv/valheim/start.sh && chown -R valheim:valheim /srv/valheim
 
 EXPOSE 2456/udp 2457/udp
 
