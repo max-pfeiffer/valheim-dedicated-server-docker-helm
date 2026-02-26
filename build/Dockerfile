@@ -36,6 +36,7 @@ COPY --chown=valheim:valheim start.sh /srv/valheim/start.sh
 
 RUN chmod +x /srv/valheim/start.sh
 
+# server port, query port
 EXPOSE 2456/udp 2457/udp
 
 # Use the unpriviledged user to run the application
