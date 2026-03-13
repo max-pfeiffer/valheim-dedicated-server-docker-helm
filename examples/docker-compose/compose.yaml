@@ -1,6 +1,18 @@
 name: valheim
 
 services:
+  init-container:
+    image: alpine:3.23
+    container_name: "init-container"
+    user: root
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "chown -R 10001:10001 /srv/valheim/saves"
+    volumes:
+      - type: volume
+        source: save_dir
+        target: "/srv/valheim/saves"
   valheim-server:
     image: "pfeiffermax/valheim-dedicated-server:latest"
     pull_policy: always
