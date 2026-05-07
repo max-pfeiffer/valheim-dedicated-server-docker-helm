@@ -125,7 +125,7 @@ spec:
             name: {{ include "valheim.fullname" $ }}
         - name: secret
           secret:
-            secretName: {{ include "valheim.fullname" $ }}
+            secretName: {{ .Values.valheimDedicatedServer.existingSecret | default (include "valheim.fullname" $) }}
   volumeClaimTemplates:
   - metadata:
       name: saves-directory
