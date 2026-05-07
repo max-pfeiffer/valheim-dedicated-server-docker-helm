@@ -3,6 +3,16 @@ entries:
   valheim:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-05-07T19:26:41.70842993Z"
+    description: A Helm chart for running a Valheim dedicated server on Kubernetes
+    digest: 999f844d41879febab3ff7d7d5a2ee556324e22ebbf94d4abdfef65279a26cee
+    name: valheim
+    type: application
+    urls:
+    - https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/releases/download/valheim-1.1.2/valheim-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v2
+    appVersion: latest
     created: "2026-02-22T15:00:34.08172695Z"
     description: A Helm chart for running a Valheim dedicated server on Kubernetes
     digest: 0d3ebe92babbc1164831771f430da09c44f6ef2266413f43efc1a0b67482fa1f
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/releases/download/valheim-0.1.0/valheim-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-22T15:00:34.081754211Z"
+generated: "2026-05-07T19:26:41.708453044Z"
