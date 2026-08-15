@@ -59,6 +59,11 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# Time Kubernetes gives the Valheim server to save the world and shut down before it is killed with
+# SIGKILL. A SIGKILL during a save can corrupt the world files, so leave generous headroom here:
+# saving a large, long-running world takes considerably longer than the Kubernetes default of 30s.
+terminationGracePeriodSeconds: 300
+
 nodeSelector: {}
 
 tolerations: []

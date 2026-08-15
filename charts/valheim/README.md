@@ -64,6 +64,22 @@ Especially RAM is quite critical as Kubernetes is evicting/kills the Pod when it
 you want to check your monitoring and adjust `resource.limits.memory` when you see that happening. It's generally a
 good idea to set the limit a bit higher than what you think the Valheim server will request.
 
+### Graceful shutdown
+When a Pod is stopped, Kubernetes sends `SIGTERM` and then waits `terminationGracePeriodSeconds`
+before killing the container with `SIGKILL`. The Valheim server uses that window to save the world,
+and a `SIGKILL` landing in the middle of a save can corrupt your world files. The Kubernetes default
+of 30 seconds is on the short side for a large world, so this chart defaults to a more generous
+value:
+```yaml
+terminationGracePeriodSeconds: 300
+```
+This costs you nothing in the normal case: the Pod terminates as soon as the server process exits.
+Raise it further if you run a very large world and see saves being cut short in the Pod logs.
+
+Note that graceful shutdown depends on the entrypoint of the `pfeiffermax/valheim-dedicated-server`
+image forwarding the shutdown signal to the server process. Images published before that was
+implemented let the server be killed without saving, no matter how long the grace period is.
+
 ### Startup Probe
 Valheim server startup is rather slow. This is mainly due to generating the world. So you might need to raise the
 `failureThreshold` when you see the startup probe failing. Multiply `periodSeconds` with `failureThreshold` to get
@@ -112,3 +128,95 @@ instances:
       metadata:
         annotations: {}
 ```
+
+## Migrating save games to another cluster
+The server keeps its save games in `/srv/valheim/saves`, which is backed by a PersistentVolumeClaim
+created from the `volumeClaimTemplates` of the StatefulSet. The claims are named
+`saves-directory-<statefulset>-<ordinal>`, so a release named `valheim` has its first instance's
+saves in `saves-directory-valheim-0`. Migrating a world to another cluster means copying the
+contents of that volume.
+
+### 1. Stop the server
+Never copy save games out of a running server. Valheim writes a world save by creating a new file
+and renaming it into place, so a copy taken mid-save can catch a `.db` and `.fwl` file that do not
+belong to the same save generation. Kick your players, then scale the StatefulSet down and wait
+until the Pod is really gone:
+```shell
+$ kubectl --context=source-cluster -n yournamespace scale statefulset valheim --replicas=0
+$ kubectl --context=source-cluster -n yournamespace wait --for=delete pod/valheim-0 --timeout=300s
+```
+With a graceful shutdown the server saves the world on the way out. Watch the Pod logs while it
+terminates to confirm the save completed.
+
+If you deploy with Argo CD, suspend auto-sync first. The StatefulSet uses
+`replicas: {{ len .Values.instances }}`, so a sync would scale the server back up in the middle of
+your migration.
+
+### 2. Mount the volume with a helper Pod
+The claim uses the `ReadWriteOnce` access mode, so it can only be attached to one node at a time.
+With the server scaled down, attach it to a small helper Pod instead. Run it with the same user,
+group and `fsGroup` as the server, otherwise the restored files end up with an ownership the
+server cannot write to:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: saves-shuttle
+spec:
+  securityContext:
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+  containers:
+    - name: shell
+      image: busybox:1.37
+      command: ["sleep", "infinity"]
+      volumeMounts:
+        - name: saves
+          mountPath: /srv/valheim/saves
+  volumes:
+    - name: saves
+      persistentVolumeClaim:
+        claimName: saves-directory-valheim-0
+```
+On the target cluster, install the chart first so the StatefulSet creates the claim, then scale it
+down to zero and delete the freshly generated world before restoring. Otherwise you end up mixing a
+new world into the one you are migrating.
+
+### 3. Copy the save games
+Stream the whole directory from one cluster to the other with `tar`:
+```shell
+$ kubectl --context=source-cluster -n yournamespace exec saves-shuttle -- tar -C /srv/valheim/saves -cf - . \
+  | kubectl --context=target-cluster -n yournamespace exec -i saves-shuttle -- tar -C /srv/valheim/saves -xf -
+```
+It is worth writing the archive to your machine first, as that gives you something to roll back to:
+```shell
+$ kubectl --context=source-cluster -n yournamespace exec saves-shuttle -- tar -C /srv/valheim/saves -cf - . > valheim-saves.tar
+```
+Always copy the entire save directory, not just the world file. Next to the `.db` file holding the
+world data there is a `.fwl` file with the world metadata and seed, and the two only work as a
+matching pair. The directory also holds the `.old` copies, the automatic backups produced by your
+`backups`, `backupShort` and `backupLong` settings, and the `adminlist.txt`, `bannedlist.txt` and
+`permittedlist.txt` files.
+
+### 4. Verify before starting the server
+Compare the checksums on both sides:
+```shell
+$ kubectl --context=target-cluster -n yournamespace exec saves-shuttle -- \
+  sh -c 'cd /srv/valheim/saves && find . -type f | sort | xargs sha256sum'
+```
+Check that `instances[].world` in the values of the target installation matches the name of the
+world file you copied. A mismatch is not an error: the server happily generates a brand new world
+and leaves your migrated save untouched on the volume.
+
+Then delete the helper Pods and scale the target StatefulSet up again.
+
+### Avoiding corrupted save games
+* Never run two servers on the same world. This is the biggest risk during a migration: once the
+  target is live, the source must stay scaled down or be uninstalled, and Argo CD auto-sync must
+  stay suspended until you do.
+* Never copy save games from a running server, see step 1.
+* Keep the `.db` and `.fwl` files of a world together.
+* Give the server enough time to save on shutdown, see [Graceful shutdown](#graceful-shutdown).
+* Restore the files with the UID and GID the server runs as.
+* Keep your `valheim-saves.tar` until players have confirmed the migrated world is intact.
