@@ -9,20 +9,25 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.12,<4"
 dependencies = [
-    "click (==8.4.1)",
-    "python-on-whales (==0.81.0)",
-    "steam[client] (>=1.4.4,<2.0.0)",
+    "click==8.4.1",
+    "python-on-whales==0.81.0",
+    "steam[client]>=1.4.4,<2.0.0",
 ]
 
-[tool.poetry]
+[dependency-groups]
+dev = [
+    "bcrypt==5.0.0",
+    "furl==2.1.4",
+    "pre-commit==4.6.1",
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+    "testcontainers==4.14.2",
+]
 
-[tool.poetry.group.dev.dependencies]
-bcrypt = "5.0.0"
-furl = "2.1.4"
-pre-commit = "4.6.1"
-pytest = "9.1.1"
-pytest-cov = "7.1.0"
-testcontainers = "4.14.2"
+# This project is build tooling, not a distributable package: nothing here is ever
+# installed into the image, so uv only manages the environment its scripts run in.
+[tool.uv]
+package = false
 
 [tool.ruff]
 src = ["build", "tests"]
@@ -48,7 +53,3 @@ convention = "pep257"
 testpaths = [
     "tests",
 ]
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
