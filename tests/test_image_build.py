@@ -1,4 +1,4 @@
-"""Tests Docker image build."""
+"""Tests container image build."""
 
 from build.publish import main
 from build.utils import (
@@ -7,26 +7,19 @@ from build.utils import (
 )
 from click.testing import CliRunner, Result
 from furl import furl
-from python_on_whales import DockerClient
 from requests import Response, get
-from requests.auth import HTTPBasicAuth
-from testcontainers.registry import DockerRegistryContainer
 
-from tests.constants import REGISTRY_PASSWORD, REGISTRY_TOKEN, REGISTRY_USERNAME
-
-BASIC_AUTH: HTTPBasicAuth = HTTPBasicAuth(REGISTRY_USERNAME, REGISTRY_PASSWORD)
+from tests.constants import REGISTRY_TOKEN, REGISTRY_USERNAME
 
 
 def test_image_build(
-    registry_container: DockerRegistryContainer,
+    registry: str,
     cli_runner: CliRunner,
-    docker_client: DockerClient,
-):
-    """Test building the Docker image.
+) -> None:
+    """Test building the container image with Podman and pushing it.
 
-    :param registry_container:
+    :param registry:
     :param cli_runner:
-    :param docker_client:
     :return:
     """
     result: Result = cli_runner.invoke(
@@ -34,33 +27,30 @@ def test_image_build(
         env={
             "DOCKER_HUB_USERNAME": REGISTRY_USERNAME,
             "DOCKER_HUB_TOKEN": REGISTRY_TOKEN,
-            "REGISTRY": registry_container.get_registry(),
+            "REGISTRY": registry,
             "PUBLISH_MANUALLY": "1",
         },
     )
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
-    furl_item: furl = furl(f"http://{registry_container.get_registry()}")
-    furl_item.path /= "v2/_catalog"
+    catalog_url: furl = furl(f"http://{registry}")
+    catalog_url.path /= "v2/_catalog"
 
-    # response: Response = get(furl_item.url, auth=BASIC_AUTH)
-    response: Response = get(furl_item.url)
+    response: Response = get(catalog_url.url)
 
     assert response.status_code == 200
     assert response.json() == {"repositories": ["pfeiffermax/valheim-dedicated-server"]}
 
-    furl_item: furl = furl(f"http://{registry_container.get_registry()}")
-    furl_item.path /= "v2/pfeiffermax/valheim-dedicated-server/tags/list"
+    tags_url: furl = furl(f"http://{registry}")
+    tags_url.path /= "v2/pfeiffermax/valheim-dedicated-server/tags/list"
 
-    # response: Response = get(furl_item.url, auth=BASIC_AUTH)
-    response: Response = get(furl_item.url)
+    response = get(tags_url.url)
 
     assert response.status_code == 200
 
     response_image_tags: list[str] = response.json()["tags"]
 
-    current_rust_server_build_id = get_valheim_build_id()
-    tag = create_tag(current_rust_server_build_id)
+    tag: str = create_tag(get_valheim_build_id())
 
     assert tag in response_image_tags
     assert "latest" in response_image_tags

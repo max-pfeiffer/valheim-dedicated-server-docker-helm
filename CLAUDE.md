@@ -11,8 +11,11 @@ server:
 * the `valheim` Helm chart for Kubernetes (`charts/valheim/`)
 
 The Python code is **build tooling only** — nothing in `build/` ships inside the image except
-`start.sh` and the `Dockerfile`. That is why `pyproject.toml` sets `[tool.uv] package = false`:
+`start.sh` and the `Containerfile`. That is why `pyproject.toml` sets `[tool.uv] package = false`:
 uv manages the environment the scripts run in and never installs the project itself.
+
+The image is built with **Podman** (driven through `python_on_whales`), not Docker. There is no
+Docker daemon anywhere in the toolchain — CI, tests and local builds all shell out to `podman`.
 
 ## Commands
 
@@ -25,15 +28,43 @@ uv run pytest                                      # test suite
 uv run pytest tests/test_image_build.py::test_image_build --cov build
 helm lint charts/valheim                           # chart lint, what CI runs
 uv run python -m build.publish                     # build + push the image (see below)
+
+# build the image by hand on a remote amd64 Podman host
+podman --connection remotebuilder build --platform linux/amd64 \
+    --target production-image --tag valheim:test build
 ```
 
 CI installs with `uv sync --locked`, so `uv.lock` has to be regenerated (and committed) in the
 same change whenever `pyproject.toml` dependencies move. The image publishing job runs
 `--no-dev`, so anything `build/` imports belongs in `[project] dependencies`, not the dev group.
 
-`pytest` needs a running Docker daemon: the single test starts a local registry with
-testcontainers, runs the real `build.publish` CLI against it and builds the actual image, so it
-takes minutes and pulls the Valheim server from Steam.
+`pytest` needs Podman, not Docker: the single test starts a `registry:2` container with Podman,
+runs the real `build.publish` CLI against it and builds the actual image, so it takes minutes and
+pulls the Valheim server from Steam.
+
+## Podman and the linux/amd64 constraint
+
+The image is linux/amd64 only — the install stage runs `steamcmd`, a 32-bit x86 binary that
+cannot be emulated on an arm64 Podman machine. `build/utils.py:get_podman_client()` therefore
+builds a `python_on_whales` client from `["podman"]` plus `--connection $PODMAN_CONNECTION` when
+that variable is set, so an arm64 machine can drive a remote amd64 Podman host (`remotebuilder`
+here). The `podman_connection` fixture in `tests/conftest.py` resolves it automatically:
+`PODMAN_CONNECTION` if set, else the default host when it is amd64, else the first system
+connection with an amd64 host — and exports the result so the CLI under test targets the same
+host.
+
+Podman specifics the publish CLI has to work around:
+
+* Podman's `build` has no `--push`, so `build.publish` builds and then calls `push` separately.
+* `stream_logs=True` on `buildx.build` is load-bearing: without it `python_on_whales` inspects
+  buildx builders, which Podman's buildx compatibility alias does not implement.
+* There is no buildx cache (`type=gha`) anymore, so the install stage really re-runs steamcmd on
+  every build. `steamcmd +quit` runs first in its own command for that reason: a steamcmd that
+  self-updates restarts mid-run and then fails the `app_update` with "Missing configuration".
+* The registry the test pushes to must be trusted as insecure by Podman on the *build* host, and
+  — when using a system connection — on the local machine as well for `podman login`
+  (`~/.config/containers/registries.conf.d/`). With a remote connection the registry is addressed
+  by the connection's hostname instead of `localhost:5000`, since the port is published there.
 
 `build.publish` takes its options from environment variables (`DOCKER_HUB_USERNAME`,
 `DOCKER_HUB_TOKEN`, `REGISTRY`, `PUBLISH_MANUALLY`) or the equivalent `--flags`.
@@ -92,7 +123,7 @@ these means no shutdown save and a torn world file. `terminationGracePeriodSecon
   `appVersion` stays `"latest"` since the image tracks Steam builds.
 
 Renovate only runs the `pep621` manager (`pyproject.toml` plus `uv.lock`); the Docker base images
-in `build/Dockerfile` (`steamcmd/steamcmd`, `debian:trixie-slim`), the GitHub Actions and the uv
+in `build/Containerfile` (`steamcmd/steamcmd`, `debian:trixie-slim`), the GitHub Actions and the uv
 version pinned in `.github/actions/setup-environment/action.yaml` are updated by hand.
 
 ## Conventions

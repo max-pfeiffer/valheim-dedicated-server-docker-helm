@@ -21,7 +21,6 @@ dev = [
     "pre-commit==4.6.1",
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
-    "testcontainers==4.14.2",
 ]
 
 # This project is build tooling, not a distributable package: nothing here is ever

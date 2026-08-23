@@ -80,6 +80,12 @@ docker run -it --publish 2456:2456/udp pfeiffermax/valheim-dedicated-server:late
 ### Docker Compose
 Please have a look at the [docker compose example](examples/docker-compose/README.md).
 
+### Podman Compose on a remote builder
+The image is built with [Podman](https://podman.io/). If you want to build and run it yourself on a
+remote linux/amd64 Podman host — handy on an arm64 machine, where the 32-bit x86 `steamcmd` binary
+used in the image build cannot be emulated — have a look at the
+[podman compose remote builder example](examples/podman-compose-remote-builder/README.md).
+
 ## Helm chart
 If you would like to run the Valheim server in your [Kubernetes](https://kubernetes.io/) cluster, I provide a
 [Helm chart](https://helm.sh/) you could use: [https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm](https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm)
