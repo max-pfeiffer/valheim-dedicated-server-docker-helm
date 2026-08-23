@@ -1,1 +1,1 @@
-"""Docker image build."""
+"""Container image build."""

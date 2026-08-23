@@ -1,4 +1,4 @@
-[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![codecov](https://codecov.io/gh/max-pfeiffer/valheim-dedicated-server-docker-helm/graph/badge.svg?token=kP5LQLcpJi)](https://codecov.io/gh/max-pfeiffer/valheim-dedicated-server-docker-helm)
 [![Code Quality](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/code-quality.yaml/badge.svg)](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/actions/workflows/code-quality.yaml)
@@ -79,6 +79,12 @@ docker run -it --publish 2456:2456/udp pfeiffermax/valheim-dedicated-server:late
 
 ### Docker Compose
 Please have a look at the [docker compose example](examples/docker-compose/README.md).
+
+### Podman Compose on a remote builder
+The image is built with [Podman](https://podman.io/). If you want to build and run it yourself on a
+remote linux/amd64 Podman host — handy on an arm64 machine, where the 32-bit x86 `steamcmd` binary
+used in the image build cannot be emulated — have a look at the
+[podman compose remote builder example](examples/podman-compose-remote-builder/README.md).
 
 ## Helm chart
 If you would like to run the Valheim server in your [Kubernetes](https://kubernetes.io/) cluster, I provide a

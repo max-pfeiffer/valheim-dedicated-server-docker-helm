@@ -1,4 +1,4 @@
-name: Docker Image
+name: Container Image
 
 on:
   workflow_call:
@@ -14,20 +14,22 @@ on:
         required: true
 
 jobs:
-  publish-docker-image:
+  publish-container-image:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+      - name: Show Podman version
+        run: podman version
       - name: Set up Python environment
         uses: ./.github/actions/setup-environment
       - name: Install dependencies
         run: |
-          poetry install --without dev --no-interaction --no-root
-      - name: Build and publish Images to Docker Hub
+          uv sync --locked --no-dev
+      - name: Build image with Podman and publish it to Docker Hub
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           PUBLISH_MANUALLY: ${{ inputs.PUBLISH_MANUALLY }}
         run: |          
-          poetry run python -m build.publish
+          uv run --no-dev python -m build.publish

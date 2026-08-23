@@ -1,0 +1,51 @@
+name: valheim-remote-builder
+
+services:
+  init-container:
+    image: alpine:3.23
+    container_name: "valheim-remote-builder-init"
+    user: root
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "chown -R 10001:10001 /srv/valheim/saves"
+    volumes:
+      - type: volume
+        source: save_dir
+        target: "/srv/valheim/saves"
+  valheim-server:
+    # A locally built image on the remote builder, e.g.:
+    # podman --connection remotebuilder build --tag valheim:test --target production-image build
+    image: "${VALHEIM_IMAGE:-localhost/valheim:test}"
+    pull_policy: never
+    container_name: "valheim-remote-builder-server"
+    depends_on:
+      init-container:
+        condition: service_completed_successfully
+    command:
+      - "-name"
+      - "ValheimServer"
+      - "-world"
+      - "NewWorld"
+      - "-password"
+      - "supersecret"
+      - "-port"
+      - "2456"
+      - "-public"
+      - "0"
+      - "-savedir"
+      - "/srv/valheim/saves"
+    # The Valheim server only saves the world on SIGINT, which start.sh forwards
+    # when it gets SIGTERM. Give it time to finish that shutdown save.
+    stop_grace_period: 300s
+    ports:
+      - "2456:2456/udp"
+      - "2457:2457/udp"
+    volumes:
+      - type: volume
+        source: save_dir
+        target: "/srv/valheim/saves"
+
+volumes:
+  save_dir:
+    name: "valheim-remote-builder-save-dir"
