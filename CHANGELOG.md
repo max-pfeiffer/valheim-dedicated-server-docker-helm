@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.1](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.1.0...2.1.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* uv lock ([9219240](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/commit/9219240ac0708720615330f0534828617d6e9200))
+* uv lock ([34221c3](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/commit/34221c3fa1a62820769a258d21c763e34f1b6d48))
+
 ## [2.1.0](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.0.1...2.1.0) (2026-08-23)
 
 
