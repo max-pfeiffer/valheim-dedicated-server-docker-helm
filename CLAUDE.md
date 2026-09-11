@@ -61,6 +61,10 @@ Podman specifics the publish CLI has to work around:
 * There is no buildx cache (`type=gha`) anymore, so the install stage really re-runs steamcmd on
   every build. `steamcmd +quit` runs first in its own command for that reason: a steamcmd that
   self-updates restarts mid-run and then fails the `app_update` with "Missing configuration".
+  Steam reports the same "Missing configuration" error intermittently when it throttles the
+  anonymous login (seen mostly from GitHub Actions runners), so the `app_update` is wrapped in a
+  five-attempt retry that clears `appcache` between attempts — a failed run leaves a half-written
+  `appinfo.vdf` that makes every following attempt fail identically.
 * The registry the test pushes to must be trusted as insecure by Podman on the *build* host, and
   — when using a system connection — on the local machine as well for `podman login`
   (`~/.config/containers/registries.conf.d/`). With a remote connection the registry is addressed

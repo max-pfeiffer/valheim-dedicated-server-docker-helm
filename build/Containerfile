@@ -10,8 +10,25 @@ RUN apt-get update \
 # A steamcmd that has to update itself first restarts mid-run, and the app_update of
 # that restarted run fails with "Missing configuration". Doing the self-update in a
 # separate invocation keeps the actual install from tripping over it.
+#
+# Steam also fails the app_update with "Missing configuration" every so often when it
+# throttles the anonymous login, so retry: the same command usually succeeds minutes
+# later. The appcache is dropped between attempts because a half-written appinfo.vdf
+# makes every following attempt fail the same way. `validate` resumes a partial install.
 RUN steamcmd +quit \
-    && steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit
+    && for attempt in 1 2 3 4 5; do \
+        if steamcmd +force_install_dir /srv/valheim +login anonymous +app_update 896660 validate +quit; then \
+            break; \
+        fi; \
+        if [ "$attempt" = 5 ]; then \
+            echo "steamcmd failed to install app 896660 after $attempt attempts"; \
+            exit 1; \
+        fi; \
+        echo "steamcmd attempt $attempt failed, clearing appcache and retrying"; \
+        rm -rf /root/.local/share/Steam/appcache; \
+        sleep 30; \
+    done \
+    && test -x /srv/valheim/valheim_server.x86_64
 
 FROM --platform=linux/amd64 docker.io/library/debian:trixie-slim AS production-image
 
