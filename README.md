@@ -74,3 +74,4 @@ on how to do that using [kube-vip](https://kube-vip.io/).
 
 ## Other Game Server Projects
 * [Rust dedicated server](https://github.com/max-pfeiffer/rust-game-server-docker)
+* [Windrose dedicated server](https://github.com/max-pfeiffer/windrose-dedicated-server-docker-helm)
