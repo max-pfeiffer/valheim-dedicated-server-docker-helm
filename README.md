@@ -9,7 +9,7 @@
 
 # Valheim Dedicated Server - Docker Image and Helm Chart
 This Docker image provides a [Valheim](https://www.valheimgame.com/) dedicated game server.
-You will find here also a [Helm Chart](https://helm.sh/) for running a Valheim dedicated server on [Kubernetes container orchestration system](https://kubernetes.io/).
+You will also find a [Helm chart](https://helm.sh/) here for running a Valheim dedicated server on [Kubernetes container orchestration system](https://kubernetes.io/).
 
 My automation checks the [Valheim public branch](https://steamdb.info/app/896660/depots/?branch=public) every
 night. If a new release was published by [Iron Gate Studios](https://irongate.se/), a new Docker image will be built
@@ -19,8 +19,10 @@ manually run any server updates and mess around with your Docker image. It's tha
 Have a look at the [docker compose example](examples/docker-compose/compose.yaml) and
 [its documentation](examples/docker-compose#automated-server-updates).
 There you can see how a server update can be automated with a simple script.
+You can also read [my blog article for setting up your own Valheim server with Docker and Docker Compose](https://max-pfeiffer.github.io/how-to-set-up-a-valheim-dedicated-server-using-docker-and-docker-compose.html)
+for getting some further instructions.
 
-Kudus to:
+Kudos to:
 * [@jonakoudijs](https://github.com/jonakoudijs) for providing the [Steamcmd Docker image](https://github.com/steamcmd/docker) which is used here
 
 **Docker Hub:** https://hub.docker.com/r/pfeiffermax/valheim-dedicated-server
@@ -29,23 +31,23 @@ Kudus to:
 
 ## Usage
 ### Configuration
-You can append all [Valheim console commands](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/) as commands
-when running `valheim_server.x86_64` binary. Use the regular syntax like `-name ValheimServer` or `-public 1`.
+You can append all [Valheim console commands](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/) as arguments
+when running the `valheim_server.x86_64` binary. Use the regular syntax like `-name ValheimServer` or `-public 1`.
 
 As the Valheim server is running in the Docker container as a stateless application, you want to have all stateful server
-data (config, saves, etc.) stored in a [Docker volume](https://docs.docker.com/storage/volumes/)
+data (config, saves, etc.) stored in a [Docker volume](https://docs.docker.com/engine/storage/volumes/)
 which is persisted **outside** the container. This can be configured with `-savedir`: you can specify the
 directory where this data is stored. You need to make sure that this directory is mounted on
-a [Docker Volume](https://docs.docker.com/storage/volumes/).
+a [Docker Volume](https://docs.docker.com/engine/storage/volumes/).
 
 This is especially important because you need to update the Valheim server image every month when
 [Iron Gate Studios](https://irongate.se/) releases a new software update. When you use a
-[Docker volume](https://docs.docker.com/storage/volumes/) to store the `-savedir`, all the data is still intact.
+[Docker volume](https://docs.docker.com/engine/storage/volumes/) to store the `-savedir`, all the data is still intact.
 
 ### Docker Run
 For testing purposes, you can fire up a Docker container like this:
 ```shell
-docker run -it --publish 2456:2456/udp pfeiffermax/valheim-dedicated-server:latest -name ValheimServer -world NewWorld -password supersecret -public 0
+docker run -it --publish 2456:2456/udp --publish 2457:2457/udp pfeiffermax/valheim-dedicated-server:latest -name ValheimServer -world NewWorld -password supersecret -public 0
 ```
 
 ### Docker Compose
@@ -64,13 +66,13 @@ If you would like to run the Valheim server in your [Kubernetes](https://kuberne
 There is also [documentation available](charts/valheim/README.md) for that Helm chart.
 
 If you want to run your Valheim server on bare metal Kubernetes, check out
-[my blog article](https://max-pfeiffer.github.io/blog/hosting-game-servers-on-bare-metal-kubernetes-with-kube-vip.html)
-on how to do that using [kube-vip](https://kube-vip.io/).
+[my blog article](https://max-pfeiffer.github.io/hosting-game-servers-on-bare-metal-kubernetes-with-cilium-as-cni.html)
+on how to do that using [Cilium](https://cilium.io/).
 
 ## Additional Information Sources
 * [SteamDB](https://steamdb.info/app/896660/info/)
 * [Official Valheim dedicated server guide](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/)
-* [Valheim dedictated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers)
+* [Valheim dedicated server Fandom Wiki](https://valheim.fandom.com/wiki/Dedicated_servers)
 
 ## Other Game Server Projects
 * [Rust dedicated server](https://github.com/max-pfeiffer/rust-game-server-docker)

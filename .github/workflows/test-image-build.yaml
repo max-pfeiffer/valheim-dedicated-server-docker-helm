@@ -3,9 +3,11 @@ name: Test Image Build
 on:
   pull_request:
     paths:
-      - .github/**
+      - .github/workflows/test-image-build.yaml
+      - .github/actions/setup-environment/**
       - build/**
       - tests/**
+      - pyproject.toml
       - uv.lock
 
 jobs:
