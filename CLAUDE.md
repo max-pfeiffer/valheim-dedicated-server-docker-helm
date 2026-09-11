@@ -121,7 +121,10 @@ these means no shutdown save and a torn world file. `terminationGracePeriodSecon
 
 * **Python project / image tooling**: release-please on push to `main`, ignoring `charts/**`.
   Version lives in `pyproject.toml` and `.release-please-manifest.json` — do not bump it by hand.
-  Requires conventional commit messages.
+  `uv.lock` records the project version too, so `release-please-config.json` lists it as an
+  `extra-files` TOML entry; without that the release PR fails `uv sync --locked`. The JSONPath
+  filters on `@.name.value` because release-please's TOML updater wraps every value in a tagged
+  object before evaluating the path. Requires conventional commit messages.
 * **Helm chart**: `helm/chart-releaser-action` on push to `main` touching `charts/**`. It releases
   whatever `version:` is in `Chart.yaml`, so bump that manually in the same PR as chart changes.
   `appVersion` stays `"latest"` since the image tracks Steam builds.
