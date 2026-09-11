@@ -27,35 +27,6 @@ Kudus to:
 
 **GitHub Repository:** https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm
 
-## IMPORTANT CHANGE SINCE V2.0.0 (build-21981590, 20.2.2026)
-Since image version V2.0.0 the application is run with an unprivileged user and not with root user anymore. This was
-done to improve the security of this image.
-If you were persisting server identity with a [Volume](https://docs.docker.com/storage/volumes/) and start the Valheim
-dedicated server using the new image (like in the [docker compose examples](examples)), you will encounter problems 
-starting your server.
-This happens because root user still owns the files in that Volume and the new unprivileged user doesn't have
-permissions to access these files.
-
-If you are using docker compose you need to update your docker-compose.yaml with the
-[`init-container` from the example](examples/docker-compose/compose.yaml).
-This init container will adjust the file permissions in your [Volume](https://docs.docker.com/storage/volumes/).
-First stop and remove the containers then recreate and start them:
-```shell
-docker compose down
-docker compose up -d
-```
-
-If you are using Docker and a [Volume](https://docs.docker.com/storage/volumes/), please adjust the file ownership
-in your `valheim-server` container manually with this command:
-```shell
-docker exec -it -u root valheim-server chown -R valheim:valheim /srv/valheim
-```
-Please restart the Docker container afterwards. Your server should start up just fine.
-
-If you are using the Helm chart for running the Valheim dedicated server on Kubernetes, just upgrade your Helm release
-using chart version v1.1.0 or newer. This will fix file permissions in your Volume by applying the correct `fsGroup`
-for the Pod security context.
-
 ## Usage
 ### Configuration
 You can append all [Valheim console commands](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/) as commands
@@ -103,3 +74,4 @@ on how to do that using [kube-vip](https://kube-vip.io/).
 
 ## Other Game Server Projects
 * [Rust dedicated server](https://github.com/max-pfeiffer/rust-game-server-docker)
+* [Windrose dedicated server](https://github.com/max-pfeiffer/windrose-dedicated-server-docker-helm)
