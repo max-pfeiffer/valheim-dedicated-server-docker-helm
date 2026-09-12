@@ -18,7 +18,7 @@ jobs:
         uses: ./.github/actions/setup-environment
       - name: Install dependencies
         run: |
-          uv sync --locked
+          uv sync
       - name: Run ruff
         run: |
           uv run pre-commit run -a
