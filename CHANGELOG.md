@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.3](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.1.2...2.1.3) (2026-09-12)
+
+
+### Documentation
+
+* updated docs and fixed some typos ([1c48cfe](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/commit/1c48cfe2f536542f6142c01afa636b0f67c8b115))
+* updated docs and fixed some typos ([74f9f49](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/commit/74f9f49da04398be712c231d3aa23f535a5f33e6))
+
 ## [2.1.2](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.1.1...2.1.2) (2026-09-11)
 
 
