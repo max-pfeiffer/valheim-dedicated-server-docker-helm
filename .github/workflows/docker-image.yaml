@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/setup-environment
       - name: Install dependencies
         run: |
-          uv sync --locked --no-dev
+          uv sync --no-dev
       - name: Build image with Podman and publish it to Docker Hub
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
