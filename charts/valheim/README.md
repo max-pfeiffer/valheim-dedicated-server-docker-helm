@@ -90,6 +90,12 @@ startupProbe:
   failureThreshold: 100
 ```
 
+The startup and liveness probes check the server port (`valheimDedicatedServer.port`). In crossplay mode the
+server does not listen on that port, as players connect through PlayFab, so if any instance has `crossPlay: true`
+the probes check the query port (`valheimDedicatedServer.port` + 1) instead. As probes are shared by all instances,
+this also applies to instances without crossplay in the same release. The query port comes up before the server
+port, so the startup probe then passes before the server is fully started.
+
 ### Valheim server config
 Tweak the Valheim server config to your liking. You can add a list of server to `instances`. Please be aware that the
 configuration of resources and ports are shared by these instances.

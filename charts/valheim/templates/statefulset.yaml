@@ -86,7 +86,7 @@ spec:
                 - "nc"
                 - "-nuzv"
                 - "127.0.0.1"
-                - "{{ .Values.valheimDedicatedServer.port }}"
+                - "{{ include "valheim.probePort" . }}"
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
@@ -98,7 +98,7 @@ spec:
                 - "nc"
                 - "-nuzv"
                 - "127.0.0.1"
-                - "{{ .Values.valheimDedicatedServer.port }}"
+                - "{{ include "valheim.probePort" . }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

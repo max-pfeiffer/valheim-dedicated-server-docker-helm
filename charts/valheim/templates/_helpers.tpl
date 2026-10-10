@@ -49,3 +49,17 @@ Selector labels
 app.kubernetes.io/name: {{ include "valheim.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Port checked by the probes: the server port, or the query port (server port + 1) if any instance runs
+crossplay, as crossplay servers don't listen on the server port. Probes are shared by all instances.
+*/}}
+{{- define "valheim.probePort" -}}
+{{- $port := .Values.valheimDedicatedServer.port }}
+{{- range .Values.instances }}
+{{- if .crossPlay }}
+{{- $port = add $.Values.valheimDedicatedServer.port 1 }}
+{{- end }}
+{{- end }}
+{{- $port }}
+{{- end }}
