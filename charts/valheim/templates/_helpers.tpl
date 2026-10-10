@@ -95,3 +95,29 @@ Render only explicitly configured player lists, including empty lists.
 {{- end }}
 {{- toJson $files }}
 {{- end }}
+
+{{/* Build preset and setkey arguments for one instance. */}}
+{{- define "valheim.worldArgs" -}}
+{{- $root := index . "root" -}}
+{{- $instance := index . "instance" -}}
+{{- $args := list -}}
+{{- $preset := $instance.preset -}}
+{{- if $preset -}}
+  {{- $args = append $args "-preset" -}}
+  {{- $args = append $args $preset -}}
+{{- end -}}
+{{- $instanceModifiers := $instance.modifiers | default dict -}}
+{{- $modifiers := mergeOverwrite (deepCopy $root.Values.valheimDedicatedServer.modifiers) $instanceModifiers -}}
+{{- range $modifier, $value := $modifiers -}}
+  {{- $args = append $args "-modifier" -}}
+  {{- $args = append $args $modifier -}}
+  {{- $args = append $args $value -}}
+{{- end -}}
+{{- $instanceSetKeys := $instance.setKeys | default list -}}
+{{- $setKeys := uniq (concat $root.Values.valheimDedicatedServer.setKeys $instanceSetKeys) -}}
+{{- range $key := $setKeys -}}
+  {{- $args = append $args "-setkey" -}}
+  {{- $args = append $args $key -}}
+{{- end -}}
+{{- join " " $args -}}
+{{- end -}}

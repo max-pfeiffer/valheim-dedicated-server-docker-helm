@@ -26,8 +26,13 @@ fi
 
 # Expand environment variables in arguments which are specified by the Helm chart
 EXPANDED_ARGS=()
+read -r -a WORLD_ARGS <<< "${worldArgs:-}"
 for ARG in "$@"; do
-  EXPANDED_ARGS+=("$(printf '%s' "$ARG" | envsubst)")
+  if [[ "$ARG" == "__VALHEIM_WORLD_ARGS__" ]]; then
+    EXPANDED_ARGS+=("${WORLD_ARGS[@]}")
+  else
+    EXPANDED_ARGS+=("$(printf '%s' "$ARG" | envsubst)")
+  fi
 done
 set -- "${EXPANDED_ARGS[@]}"
 

@@ -27,6 +27,34 @@ monitor the [Valheim Docker Image](https://hub.docker.com/r/pfeiffermax/valheim-
 Valheim installation automatically when a new image is released.
 
 ## Configuration options
+### Image, storage, and server settings
+The chart defaults to the `pfeiffermax/valheim-dedicated-server:latest` image. Set
+`image.repository`, `image.tag`, and `image.pullPolicy` to select another image or pin a release.
+The server listens on UDP `valheimDedicatedServer.port` (default `2456`) and the following port
+(`2457` by default) for queries. Both ports are exposed by the headless Service and each
+instance's Service. Each instance Service defaults to `LoadBalancer`; choose another Kubernetes
+Service type or configure its metadata under that instance's `service` values. Set
+`service.externalTrafficPolicy` to `Local` when preserving client source addresses is needed and
+the load balancer supports it; omit it or set it to `null` to leave Kubernetes' default behavior.
+
+Each StatefulSet replica gets its own `ReadWriteOnce` save volume. Set
+`valheimDedicatedServer.volumeStorageSize` to change the requested size (default `1Gi`). The chart
+does not define a storage class, so the cluster's default StorageClass is used. Storage class and
+other PVC settings can be customized by editing the chart templates.
+
+By default, the chart creates a Kubernetes Secret containing each instance's password. To use a
+pre-created Secret instead, set `valheimDedicatedServer.existingSecret` to its name. The Secret
+must contain one key per pod, named `<release-and-chart-name>-<ordinal>` (for example,
+`valheim-0` for release `valheim`), and each key's value must be shell assignments such as
+`password="your-password"`. The chart mounts the key matching each pod name as its password file.
+When using the built-in Secret, password changes alone do not trigger a rollout; restart the
+StatefulSet after changing a password.
+
+The chart also accepts standard scheduling and pod settings: `imagePullSecrets`, `podAnnotations`,
+`podLabels`, `nodeSelector`, `tolerations`, and `affinity`. `startupProbe` and `livenessProbe` tune
+the UDP health checks. Probe fields are passed through to Kubernetes as configured in
+`values.yaml`.
+
 ### Security Context
 As the `pfeiffermax/valheim-dedicated-server` image runs the Valheim server with an unprivileged user since V2.0.0,
 secure default values for `podSecurityContext` and `securityContext` were added.
@@ -134,22 +162,31 @@ instances:
 `service.externalTrafficPolicy` is optional; omit it or set it to `null` to leave it unset.
 
 ### World modifiers
-Set optional world modifiers under `valheimDedicatedServer`. These settings apply to all instances
-in the StatefulSet and are rendered directly in its container arguments. By default, no world
-modifier arguments are passed.
+Set optional modifier and checkbox key defaults under `valheimDedicatedServer`, then override or
+extend them per server under each `instances` entry. Presets are configured per instance. By
+default, no world modifier arguments are passed.
 
 ```yaml
 valheimDedicatedServer:
-  preset: hard
   modifiers:
-    raids: none
+    raids: less
   setKeys:
     - nomap
+
+instances:
+  - name: "ValheimServer"
+    preset: hard
+    modifiers:
+      raids: none
+    setKeys:
+      - nomap
 ```
 
-This adds `-preset hard -modifier raids none -setkey nomap` to the server arguments. A preset
+For this instance, the chart passes `-preset hard -modifier raids none -setkey nomap`. A preset
 overwrites previous modifiers, so the chart always places it before individual modifiers and
-checkbox keys. Each option can also be used independently.
+checkbox keys. Per-instance modifiers override matching defaults, and checkbox keys are combined
+with the defaults. Each option can also be used independently. The chart schema rejects unknown
+preset names, modifier names or values, and checkbox keys.
 
 Valid presets are `normal`, `casual`, `easy`, `hard`, `hardcore`, `immersive`, and `hammer`.
 
@@ -171,22 +208,29 @@ instances:
   - name: "ValheimServer"
     # Include the remaining instance settings from values.yaml.
     adminList:
-      - "PLAYER_ID_HERE"
+      - "Steam_384239847998"
     bannedList: []
     permittedList: null
+  - name: "ValheimServer2"
+    # Include the remaining instance settings from values.yaml.
+    adminList: []
+    bannedList: null
+    permittedList:
+      - "ANOTHER_PLAYER_ID"
 ```
 
 Each entry is a quoted player ID, written on its own line. Use the ID format expected by your
 server version, as described in the [Valheim dedicated server guide](https://www.valheimgame.com/support/a-guide-to-dedicated-servers/).
-Each instance has its own list contents. Because StatefulSet pods share mount definitions,
-each list must be configured for all instances or left `null`/omitted for all instances.
-Use `[]` when an instance needs an empty managed list. Helm rejects mixed configurations.
+Each instance has its own list contents. Use `[]` when an instance needs an empty managed list and
+`null`/omit the field when its file should remain unmanaged.
+Because StatefulSet pods share volume mount definitions, a given list must be managed for every
+instance or unmanaged for every instance; Helm rejects mixed configurations for the same list.
 
 Each list defaults to `null`, leaving its file on the save volume unmanaged. An empty list (`[]`)
 mounts an empty file. A populated list mounts the specified entries. A nonempty permitted list
 restricts access to those players, so include everyone who should be able to join.
 
-Configured files are stored in the chart's ConfigMap and mounted read-only into
+Configured files are stored in a separate player-list ConfigMap and mounted read-only into
 `/srv/valheim/saves` using `subPathExpr` to select files by Pod name. Manage them through Helm;
 in-game ban/unban commands cannot persist changes to a Helm-managed banned list.
 Changes to the generated ConfigMap, including world modifiers and player lists, trigger a rollout

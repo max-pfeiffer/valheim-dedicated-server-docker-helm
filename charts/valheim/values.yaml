@@ -96,11 +96,7 @@ valheimDedicatedServer:
   # If this is set, valheimDedicatedServer.password will be ignored.
   # The existing secret needs to have stored Valheim server password under the key password.
   existingSecret: ""
-  # Optional world modifier preset shared by all instances.
-  # Valid presets: normal, casual, easy, hard, hardcore, immersive, hammer.
-  # A preset overwrites previous modifiers; modifiers and setKeys below are applied afterwards.
-  preset: ""
-  # Optional world modifiers, for example: { raids: none, resources: more }.
+  # Optional default world modifiers, for example: { raids: none, resources: more }.
   # Valid modifiers and values:
   # combat: veryeasy, easy, hard, veryhard
   # deathpenalty: casual, veryeasy, easy, hard, hardcore
@@ -108,7 +104,7 @@ valheimDedicatedServer:
   # raids: none, muchless, less, more, muchmore
   # portals: casual, hard, veryhard
   modifiers: {}
-  # Optional world modifier checkbox keys, for example: [nomap].
+  # Optional default world modifier checkbox keys, for example: [nomap].
   # Valid keys: nobuildcost, playerevents, passivemobs, nomap.
   setKeys: []
 
@@ -139,11 +135,15 @@ instances:
     backupShort: "7200"
     # Sets the interval between the subsequent automatic backups.
     backupLong: "43200"
+    # Optional per-instance overrides. Omitted values inherit valheimDedicatedServer defaults.
+    preset: ""
+    modifiers: {}
+    setKeys: []
     # Optional Helm-managed player lists for this instance.
     # null leaves the file on the save volume unmanaged; [] supplies an empty file.
-    # Each list must be configured for all instances or null/omitted for all instances.
     # Entries must be quoted player IDs, one per list item.
     # Configured files are read-only; update them through Helm, not in-game commands.
+    # Example: adminList: ["Steam_384239847998"]
     adminList: null
     bannedList: null
     permittedList: null

@@ -64,13 +64,6 @@ If you would like to run the Valheim server in your [Kubernetes](https://kuberne
 [Helm chart](https://helm.sh/) you could use: [https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm](https://max-pfeiffer.github.io/valheim-dedicated-server-docker-helm)
 
 There is also [documentation available](charts/valheim/README.md) for that Helm chart.
-It covers per-instance [world modifiers](charts/valheim/README.md#world-modifiers) and
-[Helm-managed player lists](charts/valheim/README.md#player-lists), available starting with chart version 1.3.0.
-
-The chart and container image are released independently. Chart releases use the version in
-[`Chart.yaml`](charts/valheim/Chart.yaml), which must be bumped manually for chart changes;
-release-please manages the project version and excludes the chart. Container images use
-`build-<Steam build ID>` and `latest` tags.
 
 If you want to run your Valheim server on bare metal Kubernetes, check out
 [my blog article](https://max-pfeiffer.github.io/hosting-game-servers-on-bare-metal-kubernetes-with-cilium-as-cni.html)

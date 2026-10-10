@@ -2,27 +2,35 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "valheim.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "valheim.labels" . | nindent 4 }}
 data:
   {{- range $i, $instance := .Values.instances }}
-  {{- $prefix := printf "%s-%d" (include "valheim.fullname" $) $i }}
-  {{- range $filename, $content := (include "valheim.playerLists" $instance | fromJson) }}
-  {{ printf "%s.%s" $prefix $filename }}: {{ $content | quote }}
-  {{- end }}
   {{ include "valheim.fullname" $ }}-{{ $i }}: |
-  {{- range $key, $value := $instance }}
-  {{- if not (has $key (list "password" "service" "preset" "modifiers" "setKeys" "adminList" "bannedList" "permittedList")) }}
-    {{- if eq $key "crossPlay" }}
-    {{- if $value }}
-    {{ $key }}=-crossplay
-    {{- else }}
-    {{ $key }}=
-    {{- end }}
-    {{- else }}
+    {{- range $key, $value := $instance }}
+    {{- if not (has $key (list "password" "service" "preset" "modifiers" "setKeys" "adminList" "bannedList" "permittedList")) }}
+      {{- if eq $key "crossPlay" }}
+    crossPlay={{- if $value }}-crossplay{{- end }}
+      {{- else }}
     {{ $key }}={{ $value }}
+      {{- end }}
     {{- end }}
     {{- end }}
+    worldArgs="{{ include "valheim.worldArgs" (dict "root" $ "instance" $instance) }}"
+{{- end }}
+{{- $playerLists := include "valheim.managedPlayerLists" . | fromJson }}
+{{- if $playerLists }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-player-lists" (include "valheim.fullname" .) | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "valheim.labels" . | nindent 4 }}
+data:
+  {{- range $i, $instance := .Values.instances }}
+  {{- range $filename, $content := (include "valheim.playerLists" $instance | fromJson) }}
+  {{ printf "%s-%d.%s" (include "valheim.fullname" $) $i $filename }}: {{ $content | quote }}
   {{- end }}
   {{- end }}
+{{- end }}
