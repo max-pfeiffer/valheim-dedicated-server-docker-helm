@@ -56,7 +56,7 @@ spec:
             - "$backupLong"
             - "-savedir"
             - "/srv/valheim/saves"
-            - "instanceid"
+            - "-instanceid"
             - "$(POD_NAME)"
             - "$crossPlay"
           env:
