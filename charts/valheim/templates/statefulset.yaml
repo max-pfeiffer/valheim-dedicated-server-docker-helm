@@ -1,3 +1,6 @@
+{{- $podAnnotations := deepCopy (.Values.podAnnotations | default dict) }}
+{{- $playerLists := include "valheim.managedPlayerLists" . | fromJson }}
+{{- $_ := set $podAnnotations "checksum/config" (include (print $.Template.BasePath "/configmap.yaml") . | sha256sum) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -12,7 +15,7 @@ spec:
       {{- include "valheim.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with $podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -35,6 +38,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/srv/valheim/start.sh"
           args:
             - "-name"
             - "$name"
@@ -59,6 +64,7 @@ spec:
             - "instanceid"
             - "$(POD_NAME)"
             - "$crossPlay"
+            - "__VALHEIM_WORLD_ARGS__"
           env:
             - name: POD_NAME
               valueFrom:
@@ -104,8 +110,15 @@ spec:
           volumeMounts:
             - name: saves-directory
               mountPath: "/srv/valheim/saves"
+            {{- range $filename, $_ := $playerLists }}
+            - name: {{ printf "player-list-%s" (trimSuffix ".txt" $filename) }}
+              mountPath: {{ printf "/srv/valheim/saves/%s" $filename | quote }}
+              subPathExpr: {{ printf "$(POD_NAME).%s" $filename | quote }}
+              readOnly: true
+            {{- end }}
             - name: config
               mountPath: "/srv/valheim/config"
+              readOnly: true
             - name: secret
               mountPath: "/srv/valheim/secret"
       {{- with .Values.nodeSelector }}
@@ -124,6 +137,11 @@ spec:
         - name: config
           configMap:
             name: {{ include "valheim.fullname" $ }}
+        {{- range $filename, $_ := $playerLists }}
+        - name: {{ printf "player-list-%s" (trimSuffix ".txt" $filename) }}
+          configMap:
+            name: {{ printf "%s-player-lists" (include "valheim.fullname" $) | trunc 63 | trimSuffix "-" }}
+        {{- end }}
         - name: secret
           secret:
             secretName: {{ .Values.valheimDedicatedServer.existingSecret | default (include "valheim.fullname" $) }}

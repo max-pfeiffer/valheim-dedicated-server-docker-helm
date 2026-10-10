@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "valheimDedicatedServer": {
+      "type": "object",
+      "properties": {
+        "modifiers": { "$ref": "#/definitions/modifiers" },
+        "setKeys": { "$ref": "#/definitions/setKeys" }
+      }
+    },
+    "instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "preset": { "$ref": "#/definitions/preset" },
+          "modifiers": { "$ref": "#/definitions/modifiers" },
+          "setKeys": { "$ref": "#/definitions/setKeys" },
+          "adminList": { "$ref": "#/definitions/playerList" },
+          "bannedList": { "$ref": "#/definitions/playerList" },
+          "permittedList": { "$ref": "#/definitions/playerList" },
+          "service": {
+            "type": "object",
+            "properties": {
+              "externalTrafficPolicy": {
+                "type": ["string", "null"],
+                "enum": ["Cluster", "Local", null]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "preset": {
+      "type": "string",
+      "enum": ["", "normal", "casual", "easy", "hard", "hardcore", "immersive", "hammer"]
+    },
+    "modifiers": {
+      "type": "object",
+      "properties": {
+        "combat": { "enum": ["veryeasy", "easy", "hard", "veryhard"] },
+        "deathpenalty": { "enum": ["casual", "veryeasy", "easy", "hard", "hardcore"] },
+        "resources": { "enum": ["muchless", "less", "more", "muchmore", "most"] },
+        "raids": { "enum": ["none", "muchless", "less", "more", "muchmore"] },
+        "portals": { "enum": ["casual", "hard", "veryhard"] }
+      },
+      "additionalProperties": false
+    },
+    "setKeys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["nobuildcost", "playerevents", "passivemobs", "nomap"] }
+    },
+    "playerList": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "pattern": "^\\S+$" }
+        }
+      ]
+    }
+  }
+}

@@ -39,7 +39,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ $instance.service.type }}
-  externalTrafficPolicy: {{ $instance.service.externalTrafficPolicy }}
+  {{- with $instance.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ . }}
+  {{- end }}
   ports:
     - name: server-port
       port: {{ $.Values.valheimDedicatedServer.port }}
