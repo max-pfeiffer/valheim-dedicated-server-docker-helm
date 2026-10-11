@@ -72,6 +72,9 @@ affinity: {}
 
 # Valheim dedicated server startup is slow, so you might need to bump up periodSeconds and failureThreshold
 # if you see the startup probe failing.
+# The probes check the server port. Crossplay servers don't listen on it, so if any instance runs crossplay, the
+# probes of all instances check the query port (port + 1) instead. The query port comes up before the server port,
+# so the startup probe then passes before the server is fully started.
 startupProbe:
   initialDelaySeconds: 0
   periodSeconds: 10
