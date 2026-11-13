@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.1.3...2.1.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency click to v8.5.1 ([#59](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/issues/59)) ([0d4104f](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/commit/0d4104f7bdff37b103daf0969c6a9620a9c481b7))
+
 ## [2.1.3](https://github.com/max-pfeiffer/valheim-dedicated-server-docker-helm/compare/2.1.2...2.1.3) (2026-09-12)
 
 
